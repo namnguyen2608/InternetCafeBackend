@@ -114,7 +114,7 @@ erDiagram
 ### Quy trình chạy cục bộ
 1. **Sao chép kho lưu trữ**:
    ```bash
-   git clone <link-github-cua-ban>
+   git clone <https://github.com/namnguyen2608/InternetCafeBackend>
    cd InternetCafeBackend
    ```
 2. **Khởi tạo dữ liệu và ứng dụng**:
