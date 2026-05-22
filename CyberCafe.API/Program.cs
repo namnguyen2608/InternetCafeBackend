@@ -50,6 +50,7 @@ builder.Services.AddAuthorization();
 // ── Application Services ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService,    AuthService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
@@ -66,11 +67,12 @@ builder.Services.AddSwaggerGen(c =>
     // Allow sending JWT in Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        In          = ParameterLocation.Header,
-        Description = "Enter: Bearer {token}",
         Name        = "Authorization",
-        Type        = SecuritySchemeType.ApiKey,
-        Scheme      = "Bearer"
+        Type        = SecuritySchemeType.Http,
+        Scheme      = "Bearer",
+        BearerFormat = "JWT",
+        In          = ParameterLocation.Header,
+        Description = "Enter your JWT token in the text input below (no need to prefix with 'Bearer')."
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {

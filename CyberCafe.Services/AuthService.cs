@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BCrypt.Net;
+using CyberCafe.Core.DTOs.Account;
 using CyberCafe.Core.DTOs.Auth;
 using CyberCafe.Core.Entities;
 using CyberCafe.Core.Enums;
@@ -66,6 +67,25 @@ public class AuthService : IAuthService
 
         var token = GenerateJwt(user);
         return new AuthResponse(true, token, "Login successful.");
+    }
+
+    // ── Change Password ───────────────────────────────────────────────────────
+    public async Task<AuthResponse> ChangePasswordAsync(int userId, ChangePasswordRequest request)
+    {
+        var user = await _db.Users.FindAsync(userId);
+        if (user is null)
+            return new AuthResponse(false, null, "User not found.");
+
+        if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+            return new AuthResponse(false, null, "Current password is incorrect.");
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+            return new AuthResponse(false, null, "New password must be at least 6 characters.");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        await _db.SaveChangesAsync();
+
+        return new AuthResponse(true, null, "Password changed successfully.");
     }
 
     // ── JWT Generation ────────────────────────────────────────────────────────
