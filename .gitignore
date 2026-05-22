@@ -1,0 +1,33 @@
+## Ignore Visual Studio & VS Code temporary files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore build outputs
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## Ignore EF Core migrations cache / user secrets
+*usersecrets*
+appsettings.Development.json
+
+## Ignore SQLite local database files
+*.db
+*.db-shm
+*.db-wal
+
+## Ignore OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Ignore temporary test and coverage results
+TestResults/
+*.clog
