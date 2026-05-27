@@ -16,6 +16,9 @@ public class CyberCafeDbContext : DbContext
     public DbSet<Computer> Computers => Set<Computer>();
     public DbSet<GameSession> GameSessions => Set<GameSession>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<FoodItem> FoodItems => Set<FoodItem>();
+    public DbSet<FoodOrder> FoodOrders => Set<FoodOrder>();
+    public DbSet<FoodOrderItem> FoodOrderItems => Set<FoodOrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -152,6 +155,84 @@ public class CyberCafeDbContext : DbContext
                   .WithMany(w => w.Transactions)
                   .HasForeignKey(t => t.WalletId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── FoodItem ─────────────────────────────────────────────────────────
+        modelBuilder.Entity<FoodItem>(entity =>
+        {
+            entity.HasKey(f => f.Id);
+
+            entity.Property(f => f.Name)
+                  .IsRequired()
+                  .HasMaxLength(200);
+
+            entity.Property(f => f.Description)
+                  .HasMaxLength(500)
+                  .IsRequired(false);
+
+            entity.Property(f => f.Price)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(f => f.Category)
+                  .IsRequired()
+                  .HasMaxLength(100);
+
+            entity.Property(f => f.ImageUrl)
+                  .HasMaxLength(500)
+                  .IsRequired(false);
+
+            // Seed data — sample menu
+            entity.HasData(
+                new FoodItem { Id = 1, Name = "Mì tôm Hảo Hảo",     Description = "Mì ăn liền vị tôm chua cay",  Price = 15_000m, Category = "Đồ ăn",   IsAvailable = true },
+                new FoodItem { Id = 2, Name = "Bánh mì phô mai",      Description = "Bánh mì nướng phô mai bơ",    Price = 25_000m, Category = "Đồ ăn",   IsAvailable = true },
+                new FoodItem { Id = 3, Name = "Xúc xích chiên",       Description = "Xúc xích chiên giòn",         Price = 20_000m, Category = "Đồ ăn",   IsAvailable = true },
+                new FoodItem { Id = 4, Name = "Pepsi lon",            Description = "Nước ngọt Pepsi 330ml",       Price = 15_000m, Category = "Nước uống", IsAvailable = true },
+                new FoodItem { Id = 5, Name = "Trà sữa trân châu",    Description = "Trà sữa trân châu đen 500ml", Price = 35_000m, Category = "Nước uống", IsAvailable = true },
+                new FoodItem { Id = 6, Name = "Snack Oishi tôm chua", Description = "Snack tôm chua cay 40g",      Price = 10_000m, Category = "Snack",    IsAvailable = true }
+            );
+        });
+
+        // ── FoodOrder ────────────────────────────────────────────────────────
+        modelBuilder.Entity<FoodOrder>(entity =>
+        {
+            entity.HasKey(fo => fo.Id);
+
+            entity.Property(fo => fo.TotalAmount)
+                  .HasColumnType("decimal(18,2)");
+
+            entity.Property(fo => fo.OrderTime)
+                  .IsRequired();
+
+            entity.Property(fo => fo.Status)
+                  .HasConversion<string>()
+                  .HasMaxLength(20);
+
+            // Many-to-one: FoodOrder → User
+            entity.HasOne(fo => fo.User)
+                  .WithMany()
+                  .HasForeignKey(fo => fo.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── FoodOrderItem ────────────────────────────────────────────────────
+        modelBuilder.Entity<FoodOrderItem>(entity =>
+        {
+            entity.HasKey(foi => foi.Id);
+
+            entity.Property(foi => foi.UnitPrice)
+                  .HasColumnType("decimal(18,2)");
+
+            // Many-to-one: FoodOrderItem → FoodOrder
+            entity.HasOne(foi => foi.FoodOrder)
+                  .WithMany(fo => fo.FoodOrderItems)
+                  .HasForeignKey(foi => foi.FoodOrderId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Many-to-one: FoodOrderItem → FoodItem
+            entity.HasOne(foi => foi.FoodItem)
+                  .WithMany(fi => fi.FoodOrderItems)
+                  .HasForeignKey(foi => foi.FoodItemId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

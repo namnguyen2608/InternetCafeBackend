@@ -51,6 +51,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService,    AuthService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IFoodService,    FoodService>();
 
 // ── Controllers + Swagger ─────────────────────────────────────────────────────
 builder.Services.AddControllers();
